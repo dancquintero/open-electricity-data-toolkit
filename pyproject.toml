@@ -44,3 +44,7 @@ line-length = 100
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires network or external services"]
