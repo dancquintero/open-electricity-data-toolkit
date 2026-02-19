@@ -1,0 +1,24 @@
+# Environment
+.env
+.venv/
+__pycache__/
+
+# Large data (unit-level generation, BM-level, weather)
+data/raw/aeso/csd/
+data/raw/bmrs/balancing/
+data/raw/weather/
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Claude Code
+.claude/
