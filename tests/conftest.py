@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env so API keys are available for integration tests
+
 import pandas as pd
 import pytest
 
