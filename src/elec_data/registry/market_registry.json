@@ -15,7 +15,8 @@
     "native_generation_resolution_minutes": 60,
     "data_source_primary": "gridstatus",
     "data_source_supplementary": ["aeso_ets", "aeso_csd"],
-    "api_key_required": false,
+    "api_key_required": true,
+    "api_key_env_var": "AESO_API_KEY",
     "notes": "Transitioning to nodal pricing (REM) with LMP and capacity market. Current single-zone pool price. SMP reported at 1-minute resolution. Pool price is the hourly time-weighted average of SMP.",
     "interconnections": ["BC", "Montana", "Saskatchewan"]
   },

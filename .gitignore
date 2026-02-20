@@ -22,3 +22,6 @@ build/
 
 # Claude Code
 .claude/
+
+# Windows artifacts
+nul
