@@ -2,6 +2,38 @@
 
 A Python library for collecting, storing, and harmonizing electricity market data across North American and European jurisdictions. The main contribution is the harmonization layer — normalizing data from different ISOs and TSOs into a common schema so cross-market analysis is straightforward — plus scheduled collection with local storage to overcome API lookback limitations.
 
+## Quick start (MVP)
+
+The current release supports **AESO** (Alberta) and **IESO** (Ontario) via the `gridstatus` library. European markets, resampling, and scheduled collection are on the roadmap.
+
+```bash
+pip install -e ".[viz]"
+```
+
+```python
+from elec_data import Toolkit
+
+tk = Toolkit(data_dir="./data")
+
+# Collect and query AESO prices
+tk.collect(["AESO"], ["prices"], "2024-01-01", "2024-12-31")
+prices = tk.get_prices(markets=["AESO"], start="2024-01-01", end="2024-12-31")
+print(prices.head())
+
+# Demand and generation
+tk.collect(["AESO"], ["demand", "generation"], "2024-06-01", "2024-06-30")
+demand = tk.get_demand(markets=["AESO"], start="2024-06-01", end="2024-06-30")
+gen = tk.get_generation(markets=["AESO"], start="2024-06-01", end="2024-06-30")
+
+# What data is in the local store?
+tk.status()
+```
+
+See [`examples/01_quickstart.ipynb`](examples/01_quickstart.ipynb) for a walkthrough with plots.
+
+> **Note:** AESO requires an API key (`AESO_API_KEY` environment variable).
+> IESO does not require a key.
+
 ## Why this exists
 
 Electricity market data has three problems:
