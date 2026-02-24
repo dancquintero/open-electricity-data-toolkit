@@ -1,8 +1,8 @@
 # Open Electricity Data Toolkit
 
-A Python library for collecting, storing, and harmonizing electricity market data across North American jurisdictions. The toolkit normalizes data from different ISOs into a common schema, stores it locally as Parquet, and provides a single query interface that checks the local archive before fetching from upstream APIs.
+An elementary Python library for collecting, storing, and harmonizing electricity market data across North American jurisdictions. The toolkit normalizes data from different ISOs into a common schema, stores it locally as Parquet, and provides a single query interface that checks the local archive before fetching from upstream APIs. This toolkit is the 0th project in my broader electricity markets analytical portfolio, and is intended to be an exercise in creating packages, working with Parquet files, and different open source electricity market data libraries.
 
-**Current status:** MVP release supporting AESO (Alberta) and IESO (Ontario) via the [gridstatus](https://github.com/kmax12/gridstatus) library. European markets and additional features are on the [roadmap](#roadmap).
+**Current status:** Supports limited AESO (Alberta) and IESO (Ontario) endpoints via the [gridstatus](https://github.com/kmax12/gridstatus) library. US and European markets and additional features are on the [roadmap](#roadmap).
 
 ## Quick start
 
@@ -39,9 +39,9 @@ See [`examples/01_quickstart.ipynb`](examples/01_quickstart.ipynb) for a walkthr
 
 Electricity market data presents several challenges for cross-market analysis:
 
-1. **Limited lookback windows.** Many ISOs expose only 1--2 years of historical data through their APIs. Without regular archival, older data becomes permanently unavailable. This toolkit collects data on a recurring basis and stores it locally in Parquet so that historical coverage grows over time.
+1. **Limited lookback windows.** Many ISOs expose only daily snapshots or limited historical data through their APIs. Without regular archival, older data becomes permanently unavailable. The idea from this toolkit came from collecting data on a recurring basis and storing it locally in Parquet so that historical coverage grows over time.
 
-2. **Inconsistent schemas across markets.** Alberta reports a single hourly pool price. Ontario publishes the Hourly Ontario Energy Price (HOEP). European markets use 15- or 30-minute settlement periods with different price types. Each source returns data in its own format, column naming convention, and timezone. This toolkit normalizes all of it into a common schema so that multi-market queries return clean, aligned DataFrames.
+2. **Inconsistent schemas across markets.** Alberta reports a single hourly pool price. Ontario published the Hourly Ontario Energy Price (HOEP) and has since moved onto nodal prices. European markets use 15- or 30-minute settlement periods with different price types. Each source returns data in its own format, column naming convention, and timezone. This toolkit normalizes all of it into a common schema so that multi-market queries return clean, aligned DataFrames.
 
 3. **Fragmented tooling.** `gridstatus` covers North American ISOs; `entsoe-py` covers European markets; Elexon and OMIE each have their own APIs. Rather than reimplementing these clients, this toolkit wraps them behind a unified interface and focuses on harmonization, storage, and the query layer.
 
@@ -70,7 +70,7 @@ User / Notebook
 | Market | ISO | Data types | Resolution | Source |
 |--------|-----|------------|------------|--------|
 | Alberta | AESO | Prices (pool), demand, generation by fuel | Hourly | gridstatus |
-| Ontario | IESO | Prices (HOEP), demand, generation by fuel | Hourly | gridstatus |
+| Ontario | IESO | Prices (HOEP/nodal), demand, generation by fuel | Hourly | gridstatus |
 
 ## Common data model
 
@@ -177,10 +177,9 @@ open-electricity-data-toolkit/
 ## Roadmap
 
 ### Phase 2: Multi-market and harmonization
-
+- Add US markets (ERCOT, CAISO, etc.) via `gridstatus`.
 - Add European markets via `entsoe-py` (Germany, France, Spain, Great Britain) and Elexon BMRS for GB settlement data.
 - Implement time-resolution resampling so that markets with different native intervals (15-min, 30-min, hourly) can be queried at a common resolution.
-- Add cross-border flow data and pivot/wide-format output for multi-market price comparison.
 
 ### Phase 3: Scheduling and supplemental data
 
@@ -206,18 +205,13 @@ open-electricity-data-toolkit/
 
 | Source | Required | Registration |
 |--------|----------|--------------|
-| AESO (via gridstatus) | Yes (free) | Set `AESO_API_KEY` in `.env` |
+| AESO (via gridstatus) | Yes | Set `AESO_API_KEY` in `.env` |
 | IESO (via gridstatus) | No | -- |
-| ENTSO-E | Yes (free) | https://transparency.entsoe.eu (planned) |
-| Elexon BMRS | Yes (free) | https://bmrs.elexon.co.uk (planned) |
+| ENTSO-E | Yes | https://transparency.entsoe.eu (planned) |
+| Elexon BMRS | Yes | https://bmrs.elexon.co.uk (planned) |
 
-## Design decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| Use gridstatus/entsoe-py as dependencies | These libraries already handle API specifics. The toolkit's value is in harmonization, storage, and the unified query interface. |
-| Store at native resolution | Downsampling discards information. Data is stored at its original granularity and resampled on read. |
-| Parquet over CSV | 10--30x smaller file sizes, native type preservation, partition-friendly, and directly queryable with DuckDB. |
-| UTC internally | Eliminates daylight saving time ambiguity and makes cross-market timestamp alignment straightforward. |
-| Collection log as Parquet | Collection metadata can be queried with the same tools as the data itself. |
-| Market registry as JSON | Human-readable, easy to extend, and serves as inline documentation of each market's conventions. |
+## Author
+
+Daniel Quintero.
+MA Economics, University of Toronto. Former IESO data scientist with experience building operational load forecasting models and analyzing wholesale electricity markets, including Alberta, Ontario, and ERCOT.
